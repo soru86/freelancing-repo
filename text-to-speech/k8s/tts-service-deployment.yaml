@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tts-storage-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tts-service
+  template:
+    metadata:
+      labels:
+        app: tts-service
+    spec:
+      containers:
+      - name: tts-service
+        image: tts-service:latest
+        ports:
+        - containerPort: 3003
+        env:
+        - name: PORT
+          value: "3003"
+        - name: DB_HOST
+          value: "postgres"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "tts_db"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: REDIS_URL
+          value: "redis://redis:6379"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: jwt-secret
+        - name: USER_SERVICE_URL
+          value: "http://user-service:3002"
+        - name: AUDIO_STORAGE_PATH
+          value: "/app/storage/audio"
+        volumeMounts:
+        - name: tts-storage
+          mountPath: /app/storage/audio
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+      volumes:
+      - name: tts-storage
+        persistentVolumeClaim:
+          claimName: tts-storage-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-service
+spec:
+  selector:
+    app: tts-service
+  ports:
+  - port: 3003
+    targetPort: 3003
+

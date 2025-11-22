@@ -1,0 +1,26 @@
+{
+  "name": "text-to-speech-microservices",
+  "version": "1.0.0",
+  "description": "Microservices-based text-to-speech application",
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../services/auth-service && npm install && cd ../tts-service && npm install && cd ../user-service && npm install && cd ../admin-service && npm install && cd ../api-gateway && npm install",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:auth": "cd services/auth-service && npm run dev",
+    "dev:tts": "cd services/tts-service && npm run dev",
+    "dev:user": "cd services/user-service && npm run dev",
+    "dev:admin": "cd services/admin-service && npm run dev",
+    "dev:gateway": "cd services/api-gateway && npm run dev",
+    "build": "cd frontend && npm run build",
+    "migrate": "cd services/user-service && npm run migrate",
+    "seed": "cd services/user-service && npm run seed"
+  },
+  "keywords": [
+    "text-to-speech",
+    "microservices",
+    "nextjs",
+    "kubernetes"
+  ],
+  "author": "",
+  "license": "MIT"
+}
+
